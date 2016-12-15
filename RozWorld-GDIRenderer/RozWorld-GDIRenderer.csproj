@@ -8,8 +8,8 @@
     <ProjectGuid>{0008DC2A-C8EF-4F2E-9AE3-DC63E8536C07}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>Oddmatics.RozWorld.FrontEnd.GDI</RootNamespace>
-    <AssemblyName>Oddmatics.RozWorld.FrontEnd.GDI</AssemblyName>
+    <RootNamespace>Oddmatics.RozWorld.FrontEnd.Gdi</RootNamespace>
+    <AssemblyName>Oddmatics.RozWorld.FrontEnd.Gdi</AssemblyName>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
@@ -45,7 +45,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="GDIRenderer.cs" />
+    <Compile Include="GdiRenderer.cs" />
+    <Compile Include="GdiVewportForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

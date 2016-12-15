@@ -1,5 +1,5 @@
 ﻿/**
- * Oddmatics.RozWorld.FrontEnd.GDIRenderer -- RozWorld GDI+ Renderer
+ * Oddmatics.RozWorld.FrontEnd.GdiRenderer -- RozWorld GDI+ Renderer
  *
  * This source-code is part of the client program for the RozWorld project by rozza of Oddmatics:
  * <<http://www.oddmatics.uk>>
@@ -10,65 +10,50 @@
  */
 
 using Oddmatics.RozWorld.API.Client;
+using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.Windows.Forms;
+using System.Threading;
 
-namespace Oddmatics.RozWorld.FrontEnd
+namespace Oddmatics.RozWorld.FrontEnd.Gdi
 {
     /// <summary>
     /// Represents the GDI+ based renderer that will be loaded by the RozWorld client.
     /// </summary>
-    public class GDIRenderer : Renderer
+    public class GdiRenderer : Renderer
     {
         public override bool Initialised { get; protected set; }
-        public override byte WindowCount
-        {
-            get { return (byte)Windows.Count; }
-        }
+        public override byte WindowCount { get { return (byte)Windows.Count; } }
 
 
-        private byte ActiveBuffer;
-        private Bitmap[] Buffers;
-        private Graphics GfxContext;
-        private PictureBox Viewport;
-        private List<Form> Windows;
+        private List<GdiViewportForm> Windows;
 
 
         public override void Draw()
         {
-            // TODO: Do drawing here!
-            GfxContext.Clear(Color.Black);
-
-            SwapBuffers();
+            foreach (var window in Windows)
+            {
+                window.Draw();
+            }
         }
 
+
+        [STAThread]
         public override void Initialise()
         {
+            if (Initialised)
+                throw new InvalidOperationException("GdiRenderer.Initialise: The renderer is already initialised.");
+
             // TODO: Replace 800x600 res with resolution info - no magic numbers!!
+            Windows = new List<GdiViewportForm>();
+            Windows.Add(new GdiViewportForm(new Size(800, 600)));
 
-            // Create form
-            var initialForm = new Form();
+            //Windows[0].ShowDialog(); // THIS DOES NOT WORK PROPERLY - TODO!
 
-            initialForm.FormBorderStyle = FormBorderStyle.None;
-            initialForm.Size = new Size(800, 600);
-            initialForm.FormBorderStyle = FormBorderStyle.FixedSingle; // This is so that the viewport stays 800x600
-            initialForm.MaximizeBox = false;
-            initialForm.Text = "RozWorld GDI+ Prototype";
+            new Thread(() => Application.Run(Windows[0])).Start();
 
-            // Create graphics buffers
-            Buffers = new Bitmap[] { new Bitmap(800, 600), new Bitmap(800, 600) };
-            ActiveBuffer = 1;
-            GfxContext = Graphics.FromImage(Buffers[1]);
-
-            // Create PictureBox (temporary - need to move to allow for multiple windows to work)
-            Viewport = new PictureBox();
-
-            Viewport.Dock = DockStyle.Fill;
-            Viewport.Image = Buffers[0];
-
-            initialForm.Controls.Add(Viewport);
-            initialForm.ShowDialog(); // THIS DOES NOT WORK PROPERLY - TODO!
+            Initialised = true;
         }
 
         public override void SetWindowSize(byte window, short width, short height)
@@ -83,15 +68,6 @@ namespace Oddmatics.RozWorld.FrontEnd
         public override void SetWindows(byte count)
         {
             throw new System.NotImplementedException();
-        }
-
-
-        private void SwapBuffers()
-        {
-            // Set image to current buffer, then swap the active buffer to the unused one
-            Viewport.Image = Buffers[ActiveBuffer];
-            ActiveBuffer = ActiveBuffer == 0 ? (byte)1 : (byte)0;
-            Graphics.FromImage(Buffers[ActiveBuffer]);
         }
     }
 }
