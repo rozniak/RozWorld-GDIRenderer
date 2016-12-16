@@ -24,50 +24,56 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
     public class GdiRenderer : Renderer
     {
         public override bool Initialised { get; protected set; }
-        public override byte WindowCount { get { return (byte)Windows.Count; } }
+        public override byte WindowCount { get { return (byte)AppContext.Windows.Count; } }
 
 
-        private List<GdiViewportForm> Windows;
+        private GdiAppContext AppContext;
+        private bool HasStarted;
 
 
-        public override void Draw()
-        {
-            foreach (var window in Windows)
-            {
-                window.Draw();
-            }
-        }
-
-
-        [STAThread]
-        public override void Initialise()
+        public override bool Initialise()
         {
             if (Initialised)
                 throw new InvalidOperationException("GdiRenderer.Initialise: The renderer is already initialised.");
 
-            // TODO: Replace 800x600 res with resolution info - no magic numbers!!
-            Windows = new List<GdiViewportForm>();
-            Windows.Add(new GdiViewportForm(new Size(800, 600)));
-
-            //Windows[0].ShowDialog(); // THIS DOES NOT WORK PROPERLY - TODO!
-
-            new Thread(() => Application.Run(Windows[0])).Start();
+            AppContext = new GdiAppContext();
+            new Thread(() => Application.Run(AppContext)).Start();
 
             Initialised = true;
+
+            return true;
         }
 
         public override void SetWindowSize(byte window, short width, short height)
         {
             if (window >= 0 && window < WindowCount)
-            {
-                // Set window size 'ere
-                Windows[window].Size = new Size(width, height);
-            }
+                AppContext.Windows[window].Size = new Size(width, height);
         }
 
         public override void SetWindows(byte count)
         {
             throw new System.NotImplementedException();
+        }
+
+        public override void Start()
+        {
+            if (HasStarted || !Initialised)
+                throw new InvalidOperationException("GdiRenderer.Start: Invalid state to start this renderer.");
+
+            AppContext.Start();
+            HasStarted = true;
+        }
+
+        public override void Stop()
+        {
+            if (!HasStarted)
+                throw new InvalidOperationException("GdiRenderer.Stop: This renderer has not been started.");
+
+            AppContext.Stop();
+            AppContext.Dispose();
+
+            Initialised = false;
+            HasStarted = false;
         }
     }
 }

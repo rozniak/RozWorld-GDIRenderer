@@ -51,20 +51,15 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         }
 
 
-        public void Draw()
-        {
-            // TODO: Do drawing here!
-            GfxContext.Clear(Color.Black);
-
-            SwapBuffers();
-        }
-
         public void SwapBuffers()
         {
             // Set image to current buffer, then swap the active buffer to the unused one
-            _ViewportPictureBox.Image = Buffers[ActiveBuffer];
-            ActiveBuffer = ActiveBuffer == 0 ? (byte)1 : (byte)0;
-            GfxContext = Graphics.FromImage(Buffers[ActiveBuffer]);
+            lock (Buffers[ActiveBuffer])
+            {
+                _ViewportPictureBox.Image = Buffers[ActiveBuffer];
+                ActiveBuffer = ActiveBuffer == 0 ? (byte)1 : (byte)0;
+                GfxContext = Graphics.FromImage(Buffers[ActiveBuffer]);
+            }
         }
     }
 }

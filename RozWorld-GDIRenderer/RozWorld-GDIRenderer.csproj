@@ -45,6 +45,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="GdiAppContext.cs" />
     <Compile Include="GdiRenderer.cs" />
     <Compile Include="GdiVewportForm.cs">
       <SubType>Form</SubType>
