@@ -24,11 +24,21 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
     public class GdiRenderer : Renderer
     {
         public override bool Initialised { get; protected set; }
-        public override byte WindowCount { get { return (byte)AppContext.Windows.Count; } }
+        public override byte WindowCount
+        {
+            get
+            {
+                if (AppContext != null)
+                    return (byte)AppContext.Windows.Count;
+
+                return 0;
+            }
+        }
 
 
         private GdiAppContext AppContext;
-        private bool HasStarted;
+        public bool RunRenderer { get; private set; }
+        private Thread GdiThread;
 
 
         public override bool Initialise()
@@ -36,8 +46,12 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
             if (Initialised)
                 throw new InvalidOperationException("GdiRenderer.Initialise: The renderer is already initialised.");
 
-            AppContext = new GdiAppContext();
-            new Thread(() => Application.Run(AppContext)).Start();
+            GdiThread = new Thread(() => {
+                GdiAppContext appContext = new GdiAppContext(ref AppContext, this);
+                Application.Run(appContext);
+            });
+
+            GdiThread.Start();
 
             Initialised = true;
 
@@ -57,23 +71,23 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
 
         public override void Start()
         {
-            if (HasStarted || !Initialised)
+            if (RunRenderer || !Initialised)
                 throw new InvalidOperationException("GdiRenderer.Start: Invalid state to start this renderer.");
 
-            AppContext.Start();
-            HasStarted = true;
+            while (AppContext == null) { } // Wait until the link is created
+
+            RunRenderer = true; // Set this so now the renderer should run
         }
 
         public override void Stop()
         {
-            if (!HasStarted)
+            if (!RunRenderer)
                 throw new InvalidOperationException("GdiRenderer.Stop: This renderer has not been started.");
 
-            AppContext.Stop();
+            RunRenderer = false;
             AppContext.Dispose();
 
             Initialised = false;
-            HasStarted = false;
         }
     }
 }
