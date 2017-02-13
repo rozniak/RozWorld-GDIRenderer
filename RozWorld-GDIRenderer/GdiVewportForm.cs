@@ -9,6 +9,7 @@
  * Sharing, editing and general licence term information can be found inside of the "LICENCE.MD" file that should be located in the root of this project's directory structure.
  */
 
+using Oddmatics.RozWorld.API.Generic;
 using System;
 using System.Drawing;
 using System.Windows.Forms;
@@ -34,14 +35,14 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         // TEST CODE ONLY //
 
 
-        public GdiViewportForm(Size size)
+        public GdiViewportForm(System.Drawing.Size size)
         {
             // Set up form
             this.FormBorderStyle = FormBorderStyle.None;
             this.Size = size;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Text = "RozWorld GDI+ Prototype"; // TODO: Change this to use a language string
+            this.Text = RwCore.Client.ClientWindowTitle; // TODO: Change this to use a language string
 
             // Create graphics buffers
             Buffers = new Bitmap[] { new Bitmap(size.Width, size.Height),
