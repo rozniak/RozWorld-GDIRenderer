@@ -1,10 +1,10 @@
 ﻿/**
- * Oddmatics.RozWorld.FrontEnd.GdiRenderer -- RozWorld GDI+ Renderer
+ * Oddmatics.RozWorld.FrontEnd.Gdi.GdiRenderer -- RozWorld GDI+ Renderer
  *
- * This source-code is part of the client program for the RozWorld project by rozza of Oddmatics:
+ * This source-code is part of the GDI+ renderer for the RozWorld project by rozza of Oddmatics:
  * <<http://www.oddmatics.uk>>
  * <<http://roz.world>>
- * <<http://github.com/rozniak/RozWorld>>
+ * <<http://github.com/rozniak/RozWorld-GDIRenderer>>
  *
  * Sharing, editing and general licence term information can be found inside of the "LICENCE.MD" file that should be located in the root of this project's directory structure.
  */
@@ -13,8 +13,8 @@ using Oddmatics.RozWorld.API.Client;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
-using System.Windows.Forms;
 using System.Threading;
+using System.Windows.Forms;
 
 namespace Oddmatics.RozWorld.FrontEnd.Gdi
 {

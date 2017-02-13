@@ -1,7 +1,7 @@
 ﻿/**
- * Oddmatics.RozWorld.FrontEnd.GdiAppContext -- RozWorld GDI+ Application Context
+ * Oddmatics.RozWorld.FrontEnd.Gdi.GdiAppContext -- RozWorld GDI+ Application Context
  *
- * This source-code is part of the client program for the RozWorld project by rozza of Oddmatics:
+ * This source-code is part of the GDI+ renderer for the RozWorld project by rozza of Oddmatics:
  * <<http://www.oddmatics.uk>>
  * <<http://roz.world>>
  * <<http://github.com/rozniak/RozWorld>>
