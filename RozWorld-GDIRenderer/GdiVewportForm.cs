@@ -29,10 +29,11 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         private PictureBox _ViewportPictureBox;
         public PictureBox ViewportPictureBox { get { return _ViewportPictureBox; } }
 
-
-        // TEST CODE ONLY //
-        private Random rand = new Random();
-        // TEST CODE ONLY //
+        
+        //TEST CODE!//
+        private float[] VertexData;
+        private System.Drawing.Size InitialSize;
+        // // // // //
 
 
         public GdiViewportForm(System.Drawing.Size size)
@@ -67,6 +68,42 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
             // Add form events
             this.Shown += new EventHandler(GdiViewportForm_Shown);
             // TODO: Add handling closing here!
+
+
+            // Test code // // // //
+            const int tileWidth = 64;
+            const int tileHeight = 64;
+            const int tilemapWidth = 32;
+            const int tilemapHeight = 32;
+
+            InitialSize = size;
+            VertexData = new float[tilemapWidth * tilemapHeight * 6 * 2];
+
+            for (int y = 0; y < tilemapHeight; y++)
+            {
+                for (int x = 0; x < tilemapWidth; x++)
+                {
+                    float xCoordLeft = (tileWidth * x) / (float)InitialSize.Width;
+                    float xCoordRight = (tileWidth * (x + 1)) / (float)InitialSize.Width;
+                    float yCoordTop = (tileHeight * y) / (float)InitialSize.Height;
+                    float yCoordBottom = (tileHeight * (y + 1)) / (float)InitialSize.Height;
+
+                    int baseIndex = (y * tilemapWidth) + (x * 12);
+
+                    float[] quad = new float[] {
+                        xCoordLeft, yCoordTop,
+                        xCoordLeft, yCoordBottom,
+                        xCoordRight, yCoordBottom,
+
+                        xCoordRight, yCoordBottom,
+                        xCoordLeft, yCoordTop,
+                        xCoordRight, yCoordTop
+                    };
+
+                    // Copy data between arrays
+                    Array.Copy(quad, 0, VertexData, baseIndex, 12);
+                }
+            }
         }
 
 
@@ -90,8 +127,21 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
             CurrentContext.Clear(Color.Black);
 
             // This bit is for testing purposes to make sure drawing happens correctly.
-            CurrentContext.DrawRectangle(Pens.Red, rand.Next(0, 100), rand.Next(0, 100),
-                64, 64);
+            for (int tri = 0; tri < VertexData.Length; tri += 6)
+            {
+                float[] floatBuffer = new float[3 * 2]; // 3 points of 2 dimensions
+                Point[] realPoints = new Point[3];
+
+                for (int point = 0; point < 3; point++)
+                {
+                    realPoints[point] = new Point(
+                        (int)(floatBuffer[point * 2] * InitialSize.Width),
+                        (int)(floatBuffer[point * 2 + 1] * InitialSize.Height)
+                        );
+                }
+
+                CurrentContext.DrawPolygon(Pens.Blue, realPoints);
+            }
 
             SwapBuffers();
         }
