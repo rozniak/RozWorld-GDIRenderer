@@ -132,6 +132,8 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
                 float[] floatBuffer = new float[3 * 2]; // 3 points of 2 dimensions
                 Point[] realPoints = new Point[3];
 
+                Array.Copy(VertexData, tri, floatBuffer, 0, 6);
+
                 for (int point = 0; point < 3; point++)
                 {
                     realPoints[point] = new Point(
