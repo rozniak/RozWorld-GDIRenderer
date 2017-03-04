@@ -86,9 +86,9 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
                     float xCoordLeft = (tileWidth * x) / (float)InitialSize.Width;
                     float xCoordRight = (tileWidth * (x + 1)) / (float)InitialSize.Width;
                     float yCoordTop = (tileHeight * y) / (float)InitialSize.Height;
-                    float yCoordBottom = (tileHeight * (y + 1)) / (float)InitialSize.Height;
+                    float yCoordBottom = (tileHeight * (y - 1)) / (float)InitialSize.Height;
 
-                    int baseIndex = (y * tilemapWidth) + (x * 12);
+                    int baseIndex = (y * tilemapWidth * 12) + (x * 12);
 
                     float[] quad = new float[] {
                         xCoordLeft, yCoordTop,
@@ -107,7 +107,7 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         }
 
 
-        public void SwapBuffers()
+        private void SwapBuffers()
         {
             // Set image to current buffer, then swap the active buffer to the unused one
             _ViewportPictureBox.Image = Buffers[ActiveBuffer];
