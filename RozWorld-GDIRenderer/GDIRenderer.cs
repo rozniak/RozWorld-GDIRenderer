@@ -41,7 +41,13 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
             get { return (byte)Windows.Count; }
         }
 
-        
+
+        /// <summary>
+        /// Occurs when the user closes this renderer's last window.
+        /// </summary>
+        public override event EventHandler Closed;
+
+
         /// <summary>
         /// The thread that hosts the Windows Forms used to display window graphics.
         /// </summary>
@@ -64,6 +70,8 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
 
             Windows = new List<GdiViewportForm>();
             Windows.Add(new GdiViewportForm(new Size(1366, 768))); // Resolution hard coded for testing purposes
+
+            Windows[0].FormClosed += GdiRenderer_FormClosed;
 
             FormsThread = new Thread(() => Application.Run(Windows[0]));
 
@@ -122,6 +130,15 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
             }
 
             Initialised = false;
+        }
+
+
+        /// <summary>
+        /// [Event] Last form was closed.
+        /// </summary>
+        private void GdiRenderer_FormClosed(object sender, FormClosedEventArgs e)
+        {
+            this.Closed?.Invoke(this, EventArgs.Empty);
         }
     }
 }
