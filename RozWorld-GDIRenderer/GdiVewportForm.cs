@@ -21,6 +21,12 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
     /// </summary>
     internal class GdiViewportForm : Form
     {
+        /// <summary>
+        /// Gets or sets whether to prompt the user when closing this window.
+        /// </summary>
+        public bool NoClosePrompt { get; set; }
+
+
         private byte ActiveBuffer;
         private Bitmap[] Buffers;
         private Graphics[] Contexts;
