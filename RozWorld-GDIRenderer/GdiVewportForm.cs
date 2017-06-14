@@ -26,6 +26,11 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         /// </summary>
         public bool NoClosePrompt { get; set; }
 
+        /// <summary>
+        /// Gets the render context of this window.
+        /// </summary>
+        public GdiRendererContext RenderContext { get; private set; }
+
 
         private byte ActiveBuffer;
         private Bitmap[] Buffers;
@@ -38,7 +43,7 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         
         //TEST CODE!//
         private float[] VertexData;
-        private System.Drawing.Size InitialSize;
+        private Size InitialSize;
         // // // // //
 
 

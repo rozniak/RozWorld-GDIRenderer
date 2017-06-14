@@ -10,6 +10,7 @@
  */
 
 using Oddmatics.RozWorld.API.Client.Graphics;
+using Oddmatics.RozWorld.API.Generic;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -23,11 +24,6 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
     /// </summary>
     public class GdiRenderer : Renderer
     {
-        /// <summary>
-        /// Gets the IRendererContext object instance used to interact with this renderer.
-        /// </summary>
-        public override IRendererContext Context { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
-
         /// <summary>
         /// Gets the value that indicates whether this renderer has been initialised.
         /// </summary>
@@ -60,6 +56,23 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
 
 
         /// <summary>
+        /// Gets the render context of a window.
+        /// </summary>
+        /// <param name="window">The index of the window.</param>
+        /// <returns>The IRendererContext used by the window if it was found, null otherwise.</returns>
+        public override IRendererContext GetContext(byte window)
+        {
+            if (!Initialised)
+                throw new InvalidOperationException("GdiRenderer.GetContext: The renderer has not been initialised.");
+
+            if (window >= 0 && window < Windows.Count)
+                return Windows[window].RenderContext;
+
+            throw new ArgumentOutOfRangeException("GdiRenderer.GetContext: Parameter 'window' out of range. There are " +
+                Windows.Count.ToString() + " windows open, and a window of index " + window.ToString() + " was specified.");
+        }
+
+        /// <summary>
         /// Initialises this renderer.
         /// </summary>
         /// <returns>True if the renderer was successfully initialised.</returns>
@@ -81,6 +94,17 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         }
 
         /// <summary>
+        /// Loads a texture from the specified relative filepath and maps it to the given identifier.
+        /// </summary>
+        /// <param name="filepath">The relative filepath of the texture.</param>
+        /// <param name="identifier">The texture identifier.</param>
+        /// <returns>Success if the texture was loaded and mapped to the identifier.</returns>
+        public override RwResult LoadTexture(string filepath, string identifier)
+        {
+            return GdiRendererContext.LoadSharedTexture(filepath, identifier);
+        }
+
+        /// <summary>
         /// Sets the amount of windows in this renderer.
         /// </summary>
         /// <param name="count">The amount of windows.</param>
@@ -97,8 +121,14 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         /// <param name="height">The new height.</param>
         public override void SetWindowSize(byte window, short width, short height)
         {
-            //if (window >= 0 && window < WindowCount)
-            //    AppContext.Windows[window].Size = new Size(width, height);
+            if (!Initialised)
+                throw new InvalidOperationException("GdiRenderer.SetWindowSize: The renderer has not been initialised.");
+
+            if (window >= 0 && window < Windows.Count)
+                Windows[window].Size = new Size(width, height);
+            else
+                throw new ArgumentOutOfRangeException("GdiRenderer.SetWindowSize: Parameter 'window' out of range. There are " +
+                    Windows.Count.ToString() + " windows open, and a window of index " + window.ToString() + " was specified.");
         }
 
         /// <summary>
@@ -118,15 +148,15 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         /// </summary>
         public override void Stop()
         {
-            if (FormsThread.IsAlive)
+            if (!FormsThread.IsAlive)
+                throw new InvalidOperationException("GdiRenderer.Stop: GDI+ renderer thread is not running.");
+
+            if (Windows[0].InvokeRequired)
+                Windows[0].Invoke(new MethodInvoker(Stop));
+            else
             {
-                if (Windows[0].InvokeRequired)
-                    Windows[0].Invoke(new MethodInvoker(Stop));
-                else
-                {
-                    Windows[0].NoClosePrompt = true;
-                    Windows[0].Close();
-                }
+                Windows[0].NoClosePrompt = true;
+                Windows[0].Close();
             }
 
             Initialised = false;
