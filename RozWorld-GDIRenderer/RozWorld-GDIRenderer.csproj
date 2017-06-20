@@ -47,6 +47,7 @@
   <ItemGroup>
     <Compile Include="GdiRenderer.cs" />
     <Compile Include="GdiRendererContext.cs" />
+    <Compile Include="GdiRenderTask.cs" />
     <Compile Include="GdiVewportForm.cs">
       <SubType>Form</SubType>
     </Compile>

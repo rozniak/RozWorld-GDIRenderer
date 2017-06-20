@@ -32,29 +32,59 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         public GdiRendererContext RenderContext { get; private set; }
 
 
+        /// <summary>
+        /// The index of the active backbuffer bitmap.
+        /// </summary>
         private byte ActiveBuffer;
-        private Bitmap[] Buffers;
-        private Graphics[] Contexts;
-        private Timer DrawTimer;
-        private Graphics CurrentContext { get { return Contexts[ActiveBuffer]; } }
-        private PictureBox _ViewportPictureBox;
-        public PictureBox ViewportPictureBox { get { return _ViewportPictureBox; } }
 
-        
+        /// <summary>
+        /// The buffer bitmaps.
+        /// </summary>
+        private Bitmap[] Buffers;
+
+        /// <summary>
+        /// The graphics contexts for the buffers.
+        /// </summary>
+        private Graphics[] Contexts;
+
+        /// <summary>
+        /// The draw timer for updating the graphics.
+        /// </summary>
+        private Timer DrawTimer;
+
+        /// <summary>
+        /// The current graphics context.
+        /// </summary>
+        private Graphics CurrentContext { get { return Contexts[ActiveBuffer]; } }
+
+        /// <summary>
+        /// The PictureBox control that represents the viewport.
+        /// </summary>
+        public PictureBox ViewportPictureBox
+        {
+            get { return _ViewportPictureBox; }
+        }
+        private PictureBox _ViewportPictureBox;
+
+
         //TEST CODE!//
         private float[] VertexData;
         private Size InitialSize;
         // // // // //
 
 
-        public GdiViewportForm(System.Drawing.Size size)
+        /// <summary>
+        /// Initializes a new instance of the GdiViewportForm class.
+        /// </summary>
+        /// <param name="size">The size of the viewport.</param>
+        public GdiViewportForm(Size size)
         {
             // Set up form
             this.FormBorderStyle = FormBorderStyle.None;
             this.Size = size;
             this.FormBorderStyle = FormBorderStyle.FixedSingle;
             this.MaximizeBox = false;
-            this.Text = RwCore.Client.ClientWindowTitle; // TODO: Change this to use a language string
+            this.Text = RwCore.Client.ClientWindowTitle;
 
             // Create graphics buffers
             Buffers = new Bitmap[] { new Bitmap(size.Width, size.Height),
@@ -81,43 +111,12 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
             // TODO: Add handling closing here!
 
 
-            // Test code // // // //
-            const int tileWidth = 64;
-            const int tileHeight = 64;
-            const int tilemapWidth = 32;
-            const int tilemapHeight = 32;
-
-            InitialSize = size;
-            VertexData = new float[tilemapWidth * tilemapHeight * 6 * 2];
-
-            for (int y = 0; y < tilemapHeight; y++)
-            {
-                for (int x = 0; x < tilemapWidth; x++)
-                {
-                    float xCoordLeft = (tileWidth * x) / (float)InitialSize.Width;
-                    float xCoordRight = (tileWidth * (x + 1)) / (float)InitialSize.Width;
-                    float yCoordTop = (tileHeight * y) / (float)InitialSize.Height;
-                    float yCoordBottom = (tileHeight * (y - 1)) / (float)InitialSize.Height;
-
-                    int baseIndex = (y * tilemapWidth * 12) + (x * 12);
-
-                    float[] quad = new float[] {
-                        xCoordLeft, yCoordTop,
-                        xCoordLeft, yCoordBottom,
-                        xCoordRight, yCoordBottom,
-
-                        xCoordRight, yCoordBottom,
-                        xCoordLeft, yCoordTop,
-                        xCoordRight, yCoordTop
-                    };
-
-                    // Copy data between arrays
-                    Array.Copy(quad, 0, VertexData, baseIndex, 12);
-                }
-            }
+            
         }
 
-
+        /// <summary>
+        /// Swaps the graphics buffers.
+        /// </summary>
         private void SwapBuffers()
         {
             // Set image to current buffer, then swap the active buffer to the unused one
