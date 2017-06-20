@@ -4,7 +4,7 @@
  * This source-code is part of the GDI+ renderer for the RozWorld project by rozza of Oddmatics:
  * <<http://www.oddmatics.uk>>
  * <<http://roz.world>>
- * <<http://github.com/rozniak/RozWorld>>
+ * <<http://github.com/rozniak/RozWorld-GDIRenderer>>
  *
  * Sharing, editing and general licence term information can be found inside of the "LICENCE.MD" file that should be located in the root of this project's directory structure.
  */
@@ -13,6 +13,7 @@ using Oddmatics.RozWorld.API.Client.Graphics;
 using Oddmatics.RozWorld.API.Generic;
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 
 namespace Oddmatics.RozWorld.FrontEnd.Gdi
 {
@@ -43,12 +44,39 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
 
 
         /// <summary>
+        /// Gets the resultant bitmap that was constructed by this task.
+        /// </summary>
+        public Bitmap ConstructedBitmap { get; private set; }
+
+        /// <summary>
+        /// Gets the location to draw the constructed bitmap.
+        /// </summary>
+        public Point Location { get; private set; }
+
+
+        /// <summary>
         /// Constructs or reconstructs this task ready for the renderer to use.
         /// </summary>
         /// <returns>Success is the task was constructed.</returns>
         public RwResult ConstructNow()
         {
-            throw new NotImplementedException();
+            Rectangle taskRect = GetTaskRectangle();
+            var taskBmp = new Bitmap(taskRect.Width, taskRect.Height);
+
+            using (Graphics gfx = Graphics.FromImage(taskBmp))
+            {
+                // TODO: Code this
+            }
+
+            Location = taskRect.Location;
+            
+            // Swap the bitmaps
+            Bitmap oldBmp = ConstructedBitmap;
+
+            ConstructedBitmap = taskBmp;
+            oldBmp.Dispose();
+
+            return RwResult.Success;
         }
 
         /// <summary>
@@ -56,7 +84,36 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         /// </summary>
         public void Dispose()
         {
-            throw new NotImplementedException();
+            ConstructedBitmap.Dispose();
+        }
+
+
+        /// <summary>
+        /// Measures the expected size of the bitmap this task will create when constructed.
+        /// </summary>
+        /// <returns>The size of the bitmap that this task will create when constructed.</returns>
+        private Rectangle GetTaskRectangle()
+        {
+            int bottomMost = int.MinValue;
+            int leftMost = int.MaxValue;
+            int rightMost = int.MinValue;
+            int topMost = int.MaxValue;
+
+            foreach (RenderPart part in Parts)
+            {
+                foreach (RwPoint vertex in part.DrawVertices)
+                {
+                    if (vertex.Y > bottomMost) bottomMost = vertex.Y;
+                    if (vertex.X < leftMost) leftMost = vertex.X;
+                    if (vertex.X > rightMost) rightMost = vertex.X;
+                    if (vertex.Y < topMost) topMost = vertex.Y;
+                }
+            }
+
+            return new Rectangle(
+                new Point(leftMost, topMost),
+                new Size(rightMost - leftMost, bottomMost - topMost)
+                );
         }
     }
 }

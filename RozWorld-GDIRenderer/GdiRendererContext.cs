@@ -100,6 +100,21 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
         }
 
         /// <summary>
+        /// Retrieves a texture's ID by its string identifier.
+        /// </summary>
+        /// <param name="identifier">The texture identifier.</param>
+        /// <returns>The ID of the texture if it was found, -1 otherwise.</returns>
+        public int GetTextureId(string identifier)
+        {
+            string lowIdentifier = identifier.ToLower();
+
+            if (TextureIdentifierMappings.ContainsKey(lowIdentifier))
+                return TextureIdentifierMappings[lowIdentifier];
+
+            return -1;
+        }
+
+        /// <summary>
         /// Loads a texture from the specified relative filepath and maps it to the given identifier.
         /// </summary>
         /// <param name="filepath">The relative filepath of the texture.</param>
