@@ -11,10 +11,12 @@
  
 using Oddmatics.RozWorld.API.Client.Graphics;
 using Oddmatics.RozWorld.API.Generic;
+using Svg;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
+using System.Linq;
 
 namespace Oddmatics.RozWorld.FrontEnd.Gdi
 {
@@ -23,6 +25,12 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
     /// </summary>
     internal class GdiRendererContext : IRendererContext
     {
+        /// <summary>
+        /// The file formats readable by GDI's Image.FromFile() method.
+        /// </summary>
+        private static readonly string[] NativeGdiFormats = { ".bmp", ".gif", ".jpeg", ".jpg", ".png", ".tiff", ".tif" };
+
+
         /// <summary>
         /// Gets the shared textures bank.
         /// </summary>
@@ -137,7 +145,15 @@ namespace Oddmatics.RozWorld.FrontEnd.Gdi
 
             try
             {
-                loadedTexture = (Bitmap)Bitmap.FromFile(filepath);
+                string extension = Path.GetExtension(filepath).ToLower();
+
+                if (NativeGdiFormats.Contains(extension))
+                    loadedTexture = (Bitmap)Bitmap.FromFile(filepath);
+                else if (extension == ".svg")
+                {
+                    SvgDocument svg = SvgDocument.Open(filepath);
+                    loadedTexture = svg.Draw();
+                }
             }
             catch (OutOfMemoryException memEx)
             {
